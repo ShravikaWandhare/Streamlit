@@ -1,0 +1,34 @@
+import streamlit as st
+import pandas as pd
+
+# Load the dataset
+@st.cache
+def load_data():
+    # Replace 'cars.csv' with the path to your dataset
+    return pd.read_csv('cars.csv')
+
+df = load_data()
+
+st.title('Car Choice Finder')
+
+# Create user input widgets
+color = st.text_input('Car Color')
+range_ = st.slider('Range (in miles)', min_value=0, max_value=1000, value=500)
+miles = st.slider('Mileage (in miles)', min_value=0, max_value=100000, value=20000)
+duration = st.slider('Duration (in months)', min_value=0, max_value=60, value=12)
+price = st.slider('Price (in USD)', min_value=0, max_value=100000, value=30000)
+
+# Filter dataset based on user inputs
+filtered_df = df[
+    (df['color'].str.contains(color, case=False, na=False)) &
+    (df['range'] >= range_) &
+    (df['miles'] <= miles) &
+    (df['duration'] <= duration) &
+    (df['price'] <= price)
+]
+
+if filtered_df.empty:
+    st.write("No cars found with the given criteria.")
+else:
+    st.write(f"Found {len(filtered_df)} cars matching your criteria:")
+    st.dataframe(filtered_df)
